@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <linearGradient id="grad16" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9333ea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="16" height="16" rx="3" fill="url(#grad16)"/>
+  <!-- Monitor bezel -->
+  <rect x="2" y="3" width="12" height="8" rx="1" fill="none" stroke="#e9d5ff" stroke-width="1"/>
+  <!-- Screen -->
+  <rect x="3" y="4" width="10" height="6" fill="#c084fc" opacity="0.6"/>
+  <!-- Portal effect - circles -->
+  <circle cx="8" cy="7" r="1.5" fill="#f3e8ff"/>
+  <circle cx="8" cy="7" r="2.5" fill="none" stroke="#f3e8ff" stroke-width="0.5" opacity="0.6"/>
+  <!-- Stand -->
+  <rect x="6" y="11" width="4" height="1" fill="#e9d5ff"/>
+</svg>
