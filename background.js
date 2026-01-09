@@ -1,578 +1,231 @@
-/**
- * Background Service Worker for Flex Portal Extension
- * Handles notifications, background tasks, and event listeners
- * Last Updated: 2026-01-09
- */
+// Flex Portal Extension - Background Script
+// Handles extension lifecycle, message passing, and data persistence
 
-// =============================================================================
-// INITIALIZATION
-// =============================================================================
-
-// Set up service worker lifecycle events
-console.log('[Service Worker] Background script loaded');
-
-// Store for managing active notifications
-const activeNotifications = new Map();
-
-// =============================================================================
-// NOTIFICATION HANDLING
-// =============================================================================
-
-/**
- * Create and display a notification
- * @param {string} id - Unique notification identifier
- * @param {Object} options - Notification options
- */
-async function showNotification(id, options) {
-  try {
-    const defaultOptions = {
-      icon: 'icons/icon-48x48.png',
-      badge: 'icons/icon-badge-32x32.png',
-      requireInteraction: false,
-      ...options
-    };
-
-    await chrome.notifications.create(id, {
-      type: 'basic',
-      ...defaultOptions
+// Initialize extension on install/update
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    // Set default configuration on first install
+    chrome.storage.local.set({
+      extensionEnabled: true,
+      autoRefresh: false,
+      refreshInterval: 5000,
+      notifications: true,
+      theme: 'light'
     });
-
-    activeNotifications.set(id, {
-      createdAt: new Date(),
-      options: defaultOptions
+    
+    // Open welcome page
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('welcome.html')
     });
-
-    console.log(`[Notification] Created: ${id}`);
-  } catch (error) {
-    console.error(`[Notification Error] Failed to create notification ${id}:`, error);
+  } else if (details.reason === 'update') {
+    // Handle updates if needed
+    console.log('Extension updated to version', chrome.runtime.getManifest().version);
   }
-}
+});
 
-/**
- * Update an existing notification
- * @param {string} id - Notification identifier
- * @param {Object} options - Updated notification options
- */
-async function updateNotification(id, options) {
-  try {
-    const currentNotification = activeNotifications.get(id);
-    if (!currentNotification) {
-      console.warn(`[Notification] Notification ${id} not found`);
-      return;
-    }
-
-    const updatedOptions = {
-      ...currentNotification.options,
-      ...options
-    };
-
-    await chrome.notifications.update(id, updatedOptions);
-    activeNotifications.set(id, {
-      createdAt: currentNotification.createdAt,
-      updatedAt: new Date(),
-      options: updatedOptions
-    });
-
-    console.log(`[Notification] Updated: ${id}`);
-  } catch (error) {
-    console.error(`[Notification Error] Failed to update notification ${id}:`, error);
-  }
-}
-
-/**
- * Clear a notification
- * @param {string} id - Notification identifier
- */
-async function clearNotification(id) {
-  try {
-    await chrome.notifications.clear(id);
-    activeNotifications.delete(id);
-    console.log(`[Notification] Cleared: ${id}`);
-  } catch (error) {
-    console.error(`[Notification Error] Failed to clear notification ${id}:`, error);
-  }
-}
-
-/**
- * Clear all active notifications
- */
-async function clearAllNotifications() {
-  try {
-    for (const id of activeNotifications.keys()) {
-      await chrome.notifications.clear(id);
-    }
-    activeNotifications.clear();
-    console.log('[Notification] All notifications cleared');
-  } catch (error) {
-    console.error('[Notification Error] Failed to clear all notifications:', error);
-  }
-}
-
-// =============================================================================
-// EVENT LISTENERS - MESSAGE HANDLING
-// =============================================================================
-
-/**
- * Listen for messages from content scripts and popup
- */
+// Listen for messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('[Message Received]', request.action, request);
+  const { action, data } = request;
 
-  try {
-    switch (request.action) {
-      case 'SHOW_NOTIFICATION':
-        showNotification(request.id, request.options)
-          .then(() => sendResponse({ success: true }))
-          .catch(error => sendResponse({ success: false, error: error.message }));
-        return true;
+  switch (action) {
+    case 'fetchPortalData':
+      handleFetchPortalData(data, sendResponse);
+      break;
+    
+    case 'saveUserSettings':
+      handleSaveUserSettings(data, sendResponse);
+      break;
+    
+    case 'getUserSettings':
+      handleGetUserSettings(sendResponse);
+      break;
+    
+    case 'logoutUser':
+      handleLogoutUser(sendResponse);
+      break;
+    
+    default:
+      sendResponse({ success: false, error: 'Unknown action' });
+  }
 
-      case 'UPDATE_NOTIFICATION':
-        updateNotification(request.id, request.options)
-          .then(() => sendResponse({ success: true }))
-          .catch(error => sendResponse({ success: false, error: error.message }));
-        return true;
+  // Return true to indicate we'll send response asynchronously
+  return true;
+});
 
-      case 'CLEAR_NOTIFICATION':
-        clearNotification(request.id)
-          .then(() => sendResponse({ success: true }))
-          .catch(error => sendResponse({ success: false, error: error.message }));
-        return true;
+// Handle fetching portal data
+function handleFetchPortalData(data, callback) {
+  const { url, method = 'GET' } = data;
 
-      case 'CLEAR_ALL_NOTIFICATIONS':
-        clearAllNotifications()
-          .then(() => sendResponse({ success: true }))
-          .catch(error => sendResponse({ success: false, error: error.message }));
-        return true;
+  if (!url) {
+    callback({ success: false, error: 'URL is required' });
+    return;
+  }
 
-      case 'GET_ACTIVE_NOTIFICATIONS':
-        const notifications = Array.from(activeNotifications.entries()).map(([id, data]) => ({
-          id,
-          ...data
-        }));
-        sendResponse({ success: true, notifications });
-        break;
+  // Retrieve auth token from storage
+  chrome.storage.local.get(['authToken'], (result) => {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
 
-      case 'SCHEDULE_TASK':
-        scheduleBackgroundTask(request.task)
-          .then(() => sendResponse({ success: true }))
-          .catch(error => sendResponse({ success: false, error: error.message }));
-        return true;
-
-      case 'GET_EXTENSION_STATUS':
-        sendResponse({ 
-          success: true, 
-          status: 'active',
-          timestamp: new Date().toISOString(),
-          version: chrome.runtime.getManifest().version
-        });
-        break;
-
-      default:
-        sendResponse({ success: false, error: 'Unknown action' });
+    if (result.authToken) {
+      headers['Authorization'] = `Bearer ${result.authToken}`;
     }
-  } catch (error) {
-    console.error('[Message Handler Error]', error);
-    sendResponse({ success: false, error: error.message });
-  }
-});
 
-// =============================================================================
-// NOTIFICATION CLICK HANDLERS
-// =============================================================================
-
-/**
- * Handle notification clicks
- */
-chrome.notifications.onClicked.addListener((notificationId) => {
-  console.log(`[Notification Clicked] ${notificationId}`);
-
-  const notification = activeNotifications.get(notificationId);
-  if (notification && notification.options.clickAction) {
-    handleNotificationAction(notificationId, 'click', notification.options);
-  }
-
-  clearNotification(notificationId);
-});
-
-/**
- * Handle notification button clicks
- */
-chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
-  console.log(`[Notification Button Clicked] ${notificationId}, button: ${buttonIndex}`);
-
-  const notification = activeNotifications.get(notificationId);
-  if (notification) {
-    handleNotificationAction(notificationId, 'button', {
-      ...notification.options,
-      buttonIndex
-    });
-  }
-
-  clearNotification(notificationId);
-});
-
-/**
- * Handle notification closure
- */
-chrome.notifications.onClosed.addListener((notificationId, byUser) => {
-  console.log(`[Notification Closed] ${notificationId}, by user: ${byUser}`);
-  activeNotifications.delete(notificationId);
-});
-
-/**
- * Process notification action
- * @param {string} notificationId - Notification identifier
- * @param {string} action - Action type ('click' or 'button')
- * @param {Object} options - Notification options
- */
-function handleNotificationAction(notificationId, action, options) {
-  try {
-    // Broadcast action to all tabs
-    chrome.tabs.query({}, (tabs) => {
-      tabs.forEach((tab) => {
-        chrome.tabs.sendMessage(tab.id, {
-          action: 'NOTIFICATION_ACTION',
-          notificationId,
-          actionType: action,
-          options
-        }).catch(() => {
-          // Tab might not have content script loaded, ignore
+    fetch(url, {
+      method: method,
+      headers: headers,
+      credentials: 'include'
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        callback({
+          success: true,
+          data: data
+        });
+      })
+      .catch((error) => {
+        console.error('Fetch error:', error);
+        callback({
+          success: false,
+          error: error.message
         });
       });
-    });
-  } catch (error) {
-    console.error('[Action Handler Error]', error);
-  }
-}
-
-// =============================================================================
-// BACKGROUND TASKS
-// =============================================================================
-
-// Storage for scheduled tasks
-const scheduledTasks = new Map();
-
-/**
- * Schedule a background task
- * @param {Object} task - Task configuration
- * @param {string} task.id - Task identifier
- * @param {string} task.action - Action to perform
- * @param {number} task.interval - Interval in milliseconds (0 for one-time)
- * @param {Object} task.data - Additional task data
- */
-async function scheduleBackgroundTask(task) {
-  const { id, action, interval = 0, data = {} } = task;
-
-  console.log(`[Task Scheduled] ${id} - Action: ${action}, Interval: ${interval}ms`);
-
-  try {
-    if (scheduledTasks.has(id)) {
-      clearInterval(scheduledTasks.get(id).intervalId);
-      scheduledTasks.delete(id);
-    }
-
-    const executeTask = async () => {
-      try {
-        await performBackgroundTask(id, action, data);
-      } catch (error) {
-        console.error(`[Task Error] Error executing task ${id}:`, error);
-      }
-    };
-
-    // Execute immediately
-    await executeTask();
-
-    // Schedule recurring task if interval is specified
-    if (interval > 0) {
-      const intervalId = setInterval(executeTask, interval);
-      scheduledTasks.set(id, { action, interval, data, intervalId });
-    }
-  } catch (error) {
-    console.error(`[Task Scheduling Error] ${id}:`, error);
-    throw error;
-  }
-}
-
-/**
- * Execute a background task
- * @param {string} id - Task identifier
- * @param {string} action - Action to perform
- * @param {Object} data - Task data
- */
-async function performBackgroundTask(id, action, data) {
-  console.log(`[Task Executing] ${id} - ${action}`);
-
-  try {
-    switch (action) {
-      case 'SYNC_DATA':
-        await syncData(data);
-        break;
-
-      case 'CHECK_STATUS':
-        await checkPortalStatus(data);
-        break;
-
-      case 'CLEANUP_CACHE':
-        await cleanupCache(data);
-        break;
-
-      case 'REFRESH_TOKEN':
-        await refreshAuthToken(data);
-        break;
-
-      default:
-        console.warn(`[Task] Unknown action: ${action}`);
-    }
-  } catch (error) {
-    console.error(`[Task Execution Error] ${id}:`, error);
-    throw error;
-  }
-}
-
-/**
- * Sync data with storage
- */
-async function syncData(data) {
-  return new Promise((resolve) => {
-    chrome.storage.local.get('flexPortalData', (result) => {
-      const currentData = result.flexPortalData || {};
-      const updatedData = { ...currentData, ...data, lastSync: new Date().toISOString() };
-      chrome.storage.local.set({ flexPortalData: updatedData }, resolve);
-    });
   });
 }
 
-/**
- * Check portal status
- */
-async function checkPortalStatus(data) {
-  try {
-    // Broadcast status check to all tabs
-    chrome.tabs.query({}, (tabs) => {
-      tabs.forEach((tab) => {
-        chrome.tabs.sendMessage(tab.id, {
-          action: 'CHECK_STATUS',
-          data
-        }).catch(() => {
-          // Tab might not have content script loaded
+// Handle saving user settings
+function handleSaveUserSettings(data, callback) {
+  if (!data || Object.keys(data).length === 0) {
+    callback({ success: false, error: 'No settings provided' });
+    return;
+  }
+
+  chrome.storage.local.set(data, () => {
+    if (chrome.runtime.lastError) {
+      callback({
+        success: false,
+        error: chrome.runtime.lastError.message
+      });
+    } else {
+      callback({ success: true, message: 'Settings saved successfully' });
+    }
+  });
+}
+
+// Handle retrieving user settings
+function handleGetUserSettings(callback) {
+  chrome.storage.local.get(null, (result) => {
+    if (chrome.runtime.lastError) {
+      callback({
+        success: false,
+        error: chrome.runtime.lastError.message
+      });
+    } else {
+      callback({
+        success: true,
+        data: result
+      });
+    }
+  });
+}
+
+// Handle user logout
+function handleLogoutUser(callback) {
+  const keysToRemove = ['authToken', 'userData', 'sessionToken'];
+
+  chrome.storage.local.remove(keysToRemove, () => {
+    if (chrome.runtime.lastError) {
+      callback({
+        success: false,
+        error: chrome.runtime.lastError.message
+      });
+    } else {
+      // Notify all tabs to update UI
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach((tab) => {
+          chrome.tabs.sendMessage(tab.id, {
+            action: 'userLoggedOut'
+          }).catch(() => {
+            // Silently ignore errors from tabs that don't have content script
+          });
         });
       });
-    });
-    console.log('[Background Task] Portal status checked');
-  } catch (error) {
-    console.error('[Status Check Error]', error);
-  }
+
+      callback({ success: true, message: 'User logged out successfully' });
+    }
+  });
 }
 
-/**
- * Cleanup cache
- */
-async function cleanupCache(data) {
-  try {
-    const maxAge = data.maxAge || 7 * 24 * 60 * 60 * 1000; // 7 days default
-    
-    return new Promise((resolve) => {
-      chrome.storage.local.get(null, (items) => {
-        const now = Date.now();
-        const keysToRemove = [];
-
-        for (const [key, value] of Object.entries(items)) {
-          if (value.timestamp && (now - value.timestamp) > maxAge) {
-            keysToRemove.push(key);
-          }
-        }
-
-        if (keysToRemove.length > 0) {
-          chrome.storage.local.remove(keysToRemove, () => {
-            console.log(`[Background Task] Cleaned up ${keysToRemove.length} items`);
-            resolve();
-          });
-        } else {
-          console.log('[Background Task] Cache cleanup: no items to remove');
-          resolve();
-        }
-      });
-    });
-  } catch (error) {
-    console.error('[Cache Cleanup Error]', error);
+// Listen for tab updates to monitor user activity
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    // Check if page requires authentication
+    checkAuthenticationStatus(tab.url);
   }
+});
+
+// Helper function to check authentication status
+function checkAuthenticationStatus(url) {
+  if (!url) return;
+
+  chrome.storage.local.get(['authToken'], (result) => {
+    if (!result.authToken && isFlexPortalUrl(url)) {
+      // User is not authenticated but visiting flex portal
+      console.warn('User visiting Flex Portal without authentication');
+    }
+  });
 }
 
-/**
- * Refresh authentication token
- */
-async function refreshAuthToken(data) {
-  try {
-    return new Promise((resolve) => {
-      chrome.storage.local.get('authToken', (result) => {
-        if (result.authToken) {
-          // Broadcast token refresh request
-          chrome.tabs.query({}, (tabs) => {
-            tabs.forEach((tab) => {
-              chrome.tabs.sendMessage(tab.id, {
-                action: 'REFRESH_TOKEN'
-              }).catch(() => {
-                // Tab might not have content script loaded
-              });
+// Helper function to check if URL is a Flex Portal URL
+function isFlexPortalUrl(url) {
+  if (!url) return false;
+  const portalDomains = ['flexportal.com', 'app.flexportal.com', 'localhost:3000'];
+  return portalDomains.some((domain) => url.includes(domain));
+}
+
+// Periodic check for session validity
+setInterval(() => {
+  chrome.storage.local.get(['sessionToken', 'sessionExpiry'], (result) => {
+    if (result.sessionToken && result.sessionExpiry) {
+      const now = Date.now();
+      if (now > result.sessionExpiry) {
+        // Session expired, logout user
+        chrome.storage.local.remove(['sessionToken', 'sessionExpiry', 'authToken']);
+        console.log('Session expired, user logged out');
+      }
+    }
+  });
+}, 60000); // Check every minute
+
+// Listen for alarm events (for scheduled tasks)
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'autoRefresh') {
+    chrome.storage.local.get(['autoRefresh'], (result) => {
+      if (result.autoRefresh) {
+        // Trigger auto-refresh logic
+        chrome.tabs.query({}, (tabs) => {
+          tabs.forEach((tab) => {
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'refreshData'
+            }).catch(() => {
+              // Silently ignore errors
             });
           });
-          console.log('[Background Task] Token refresh initiated');
-        }
-        resolve();
-      });
-    });
-  } catch (error) {
-    console.error('[Token Refresh Error]', error);
-  }
-}
-
-/**
- * Cancel a scheduled task
- * @param {string} id - Task identifier
- */
-function cancelScheduledTask(id) {
-  const task = scheduledTasks.get(id);
-  if (task) {
-    clearInterval(task.intervalId);
-    scheduledTasks.delete(id);
-    console.log(`[Task Cancelled] ${id}`);
-    return true;
-  }
-  return false;
-}
-
-// =============================================================================
-// CHROME EXTENSION LIFECYCLE EVENTS
-// =============================================================================
-
-/**
- * Extension installed
- */
-chrome.runtime.onInstalled.addListener((details) => {
-  console.log('[Extension] Installed/Updated', details.reason);
-
-  if (details.reason === 'install') {
-    // Open welcome page
-    chrome.tabs.create({ url: 'chrome://extensions/?options=' + chrome.runtime.id });
-  }
-});
-
-/**
- * Extension startup
- */
-chrome.runtime.onStartup.addListener(() => {
-  console.log('[Extension] Browser startup detected');
-  
-  // Initialize background tasks on startup
-  initializeBackgroundTasks();
-});
-
-/**
- * Initialize background tasks
- */
-function initializeBackgroundTasks() {
-  try {
-    chrome.storage.local.get('extensionSettings', (result) => {
-      const settings = result.extensionSettings || {};
-      
-      // Set up periodic sync if enabled
-      if (settings.enableAutoSync) {
-        scheduleBackgroundTask({
-          id: 'auto-sync',
-          action: 'SYNC_DATA',
-          interval: settings.syncInterval || 5 * 60 * 1000, // 5 minutes default
-          data: {}
         });
       }
-
-      // Set up periodic status check if enabled
-      if (settings.enableStatusCheck) {
-        scheduleBackgroundTask({
-          id: 'status-check',
-          action: 'CHECK_STATUS',
-          interval: settings.statusCheckInterval || 10 * 60 * 1000, // 10 minutes default
-          data: {}
-        });
-      }
-
-      // Set up daily cleanup
-      scheduleBackgroundTask({
-        id: 'daily-cleanup',
-        action: 'CLEANUP_CACHE',
-        interval: 24 * 60 * 60 * 1000, // 24 hours
-        data: { maxAge: 7 * 24 * 60 * 60 * 1000 }
-      });
-
-      console.log('[Background Tasks] Initialization completed');
     });
-  } catch (error) {
-    console.error('[Background Tasks Initialization Error]', error);
-  }
-}
-
-// =============================================================================
-// ALARM HANDLERS (for persistent background tasks)
-// =============================================================================
-
-/**
- * Handle chrome alarms
- */
-chrome.alarms.onAlarm.addListener((alarm) => {
-  console.log('[Alarm Triggered]', alarm.name);
-
-  try {
-    switch (alarm.name) {
-      case 'PERIODIC_SYNC':
-        performBackgroundTask('periodic-sync', 'SYNC_DATA', {});
-        break;
-
-      case 'PERIODIC_CHECK':
-        performBackgroundTask('periodic-check', 'CHECK_STATUS', {});
-        break;
-
-      default:
-        console.warn(`[Alarm] Unknown alarm: ${alarm.name}`);
-    }
-  } catch (error) {
-    console.error('[Alarm Handler Error]', error);
   }
 });
 
-// =============================================================================
-// UTILITY FUNCTIONS
-// =============================================================================
+// Clean up on extension unload
+chrome.runtime.onSuspend.addListener(() => {
+  console.log('Extension is being suspended');
+  // Perform cleanup if needed
+});
 
-/**
- * Get service worker status
- */
-function getServiceWorkerStatus() {
-  return {
-    status: 'active',
-    timestamp: new Date().toISOString(),
-    activeNotifications: activeNotifications.size,
-    scheduledTasks: scheduledTasks.size,
-    version: chrome.runtime.getManifest().version
-  };
-}
-
-/**
- * Log message with timestamp
- */
-function logMessage(level, message, data = null) {
-  const timestamp = new Date().toISOString();
-  const logEntry = `[${timestamp}] [${level}] ${message}`;
-  
-  if (data) {
-    console.log(logEntry, data);
-  } else {
-    console.log(logEntry);
-  }
-}
-
-// =============================================================================
-// INITIALIZATION ON LOAD
-// =============================================================================
-
-// Initialize on service worker startup
-initializeBackgroundTasks();
-console.log('[Service Worker] Initialization completed at', new Date().toISOString());
+console.log('Flex Portal Extension background script loaded');
