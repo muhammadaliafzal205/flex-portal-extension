@@ -1,408 +1,586 @@
 # Flex Portal Extension
 
-A powerful browser extension designed to enhance and extend the functionality of Flex Portal with additional features, improved workflow, and better user experience.
+> A powerful and flexible browser extension that enhances your portal experience with advanced features, seamless integration, and user-friendly interface.
 
-## 📋 Table of Contents
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-flex--portal--extension-blue)](https://github.com/muhammadaliafzal205/flex-portal-extension)
+
+---
+
+## Table of Contents
 
 - [Features](#features)
 - [Installation](#installation)
-  - [Chrome/Chromium](#chromechromium)
-  - [Firefox](#firefox)
-- [Getting Started](#getting-started)
-- [Usage Guide](#usage-guide)
-- [Configuration](#configuration)
-- [Troubleshooting](#troubleshooting)
-- [Development](#development)
-- [Contributing](#contributing)
+- [File Structure](#file-structure)
+- [Testing Instructions](#testing-instructions)
+- [Development Workflow](#development-workflow)
+- [Troubleshooting Guide](#troubleshooting-guide)
+- [Privacy Statement](#privacy-statement)
 - [License](#license)
-- [Support](#support)
+- [Contributing Guidelines](#contributing-guidelines)
+- [Roadmap](#roadmap)
 
-## ✨ Features
+---
 
-### Core Functionality
-- **Enhanced Portal Interface**: Streamlined navigation and improved UI/UX
-- **Quick Actions**: One-click access to frequently used features
-- **Customizable Dashboard**: Personalize your portal experience
-- **Data Management**: Efficient handling and organization of portal data
-- **Search & Filter**: Advanced search and filtering capabilities
-- **Dark Mode Support**: Easy on the eyes with optional dark theme
+## Features
 
-### Productivity Features
-- **Keyboard Shortcuts**: Speed up your workflow with custom hotkeys
-- **Auto-save**: Automatic saving of your work to prevent data loss
-- **Notifications**: Real-time alerts for important events
-- **History Tracking**: Keep track of your activities and changes
-- **Export Functionality**: Export data in multiple formats (CSV, PDF, JSON)
+- **Portal Enhancement**: Seamlessly integrates with portal interfaces to provide enhanced functionality
+- **User-Friendly Interface**: Intuitive design for easy navigation and usability
+- **Performance Optimized**: Lightweight extension that doesn't slow down your browser
+- **Data Privacy**: Respects user privacy with transparent data handling practices
+- **Cross-Browser Support**: Compatible with Chrome, Firefox, Edge, and other Chromium-based browsers
+- **Customizable Settings**: Tailor the extension to your preferences
+- **Real-time Updates**: Stay synchronized with the latest portal changes
+- **Error Handling**: Robust error management and recovery mechanisms
+- **Developer Friendly**: Well-documented codebase for easy maintenance and extension
 
-### User Experience
-- **Responsive Design**: Works seamlessly on different screen sizes
-- **Offline Mode**: Limited functionality available even without internet
-- **Multi-language Support**: Interface available in multiple languages
-- **Accessibility**: WCAG compliant for better accessibility
+---
 
-## 📦 Installation
+## Installation
 
-### Chrome/Chromium
+### From Source (Development)
 
-#### From Chrome Web Store (if published)
-1. Visit the [extension page on Chrome Web Store](#)
-2. Click **"Add to Chrome"**
-3. Review permissions and click **"Add extension"**
-4. The extension icon will appear in your toolbar
-
-#### From Source (Development Mode)
-1. Clone or download this repository
+1. **Clone the Repository**
    ```bash
    git clone https://github.com/muhammadaliafzal205/flex-portal-extension.git
    cd flex-portal-extension
    ```
 
-2. Open Chrome and navigate to `chrome://extensions/`
-
-3. Enable **"Developer mode"** (toggle in the top-right corner)
-
-4. Click **"Load unpacked"**
-
-5. Select the extension folder from your computer
-
-6. The extension is now installed and ready to use!
-
-### Firefox
-
-#### From Firefox Add-ons (if published)
-1. Visit the [add-on page on Mozilla Add-ons](#)
-2. Click **"Add to Firefox"**
-3. Review permissions and click **"Add"**
-4. The extension will be activated automatically
-
-#### From Source (Development Mode)
-1. Clone or download this repository
-   ```bash
-   git clone https://github.com/muhammadaliafzal205/flex-portal-extension.git
-   cd flex-portal-extension
-   ```
-
-2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
-
-3. Click **"Load Temporary Add-on"**
-
-4. Select the `manifest.json` file from the extension folder
-
-5. The extension is now loaded and ready to test!
-
-## 🚀 Getting Started
-
-### Initial Setup
-
-1. **Install the Extension**: Follow the installation instructions above for your browser
-
-2. **Grant Permissions**: When prompted, review and grant necessary permissions:
-   - Access to Flex Portal pages
-   - Storage of preferences and data
-   - Notifications (optional)
-
-3. **Open Flex Portal**: Navigate to your Flex Portal instance
-
-4. **Customize Settings**: Click the extension icon → **Settings** to configure options
-
-5. **Start Using**: Use the extension features integrated into the portal interface
-
-### First Time User Tips
-
-- Click the extension icon to view the popup menu with quick actions
-- Check the **Settings** page to customize behavior and preferences
-- Review the **Keyboard Shortcuts** section for quick productivity tips
-- Enable notifications in settings for real-time updates
-
-## 📖 Usage Guide
-
-### Accessing the Extension
-
-**Browser Toolbar**: Click the extension icon in your browser toolbar to open the popup menu
-
-**Right-click Context Menu**: Right-click on any element to see context-specific options
-
-**Keyboard Shortcuts**: Use configured hotkeys for quick access to features
-
-### Main Features
-
-#### 1. Dashboard
-- View at-a-glance summary of your Flex Portal activity
-- Quick access to frequently used features
-- Customizable widgets and layout
-
-#### 2. Search & Filter
-- Use the advanced search bar to find items quickly
-- Apply multiple filters simultaneously
-- Save custom filter combinations for later use
-
-#### 3. Quick Actions
-Common actions accessible from the toolbar:
-- Create new items
-- Search portal data
-- View notifications
-- Access settings
-
-#### 4. Data Export
-Export your data in multiple formats:
-- **CSV**: Compatible with Excel and spreadsheet applications
-- **PDF**: Professional formatted documents
-- **JSON**: Structured data for integration with other tools
-
-To export:
-1. Select items you want to export
-2. Click the **Export** button
-3. Choose your preferred format
-4. Click **Download**
-
-#### 5. Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+Shift+F` | Open search dialog |
-| `Ctrl+Shift+S` | Open settings |
-| `Ctrl+Shift+E` | Toggle dark mode |
-| `Ctrl+Shift+N` | View notifications |
-| `Alt+Q` | Show quick actions |
-
-*Note: Shortcuts may vary based on your OS and configuration*
-
-## ⚙️ Configuration
-
-### Settings Page
-
-Access settings by clicking the extension icon → **Settings** or using `Ctrl+Shift+S`
-
-#### General Settings
-- **Dark Mode**: Enable/disable dark theme
-- **Language**: Choose your preferred language
-- **Auto-save**: Enable automatic saving interval
-- **Notification**: Configure notification preferences
-
-#### Advanced Settings
-- **Custom Hotkeys**: Define custom keyboard shortcuts
-- **Data Retention**: Set how long to keep historical data
-- **Performance**: Optimize extension performance
-- **Debug Mode**: Enable for troubleshooting
-
-#### Privacy & Security
-- **Data Storage**: Choose local or cloud storage
-- **Encryption**: Enable data encryption
-- **Auto-logout**: Set idle timeout duration
-- **Clear Data**: Remove cached and stored data
-
-### Backup & Restore
-
-1. Go to **Settings** → **Backup & Restore**
-2. Click **"Create Backup"** to download your settings
-3. To restore, click **"Restore"** and select your backup file
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Extension not appearing in toolbar
-- **Solution**: Check if the extension is enabled in your browser's extension settings
-- Go to `chrome://extensions/` (Chrome) or `about:addons` (Firefox)
-- Ensure the toggle switch next to the extension is ON
-
-#### Permissions denied error
-- **Solution**: Grant necessary permissions
-- Click extension icon → **Re-grant Permissions**
-- Or remove and reinstall the extension
-
-#### Data not syncing
-- **Solution**: Check your internet connection and browser settings
-- Disable and re-enable the extension
-- Clear browser cache and cookies for the portal domain
-- Check Settings → **Sync Status**
-
-#### Extension running slowly
-- **Solution**: 
-  - Go to Settings → Advanced → disable unnecessary features
-  - Clear cached data: Settings → Privacy & Security → Clear Data
-  - Restart your browser
-  - Check system resources (RAM, CPU)
-
-#### Settings not saving
-- **Solution**:
-  - Ensure browser storage is not full
-  - Check if your browser allows storage for this site
-  - Try clearing browser cache
-  - Reinstall the extension
-
-### Debug Mode
-
-Enable debug mode for detailed logging:
-
-1. Open Settings
-2. Scroll to "Advanced Settings"
-3. Enable "Debug Mode"
-4. Check browser console for detailed logs: `F12` → Console tab
-
-### Getting Help
-
-- Check this README for solutions
-- Review extension logs (Debug Mode)
-- Contact support (see Support section below)
-- Check issues on [GitHub Issues](https://github.com/muhammadaliafzal205/flex-portal-extension/issues)
-
-## 👨‍💻 Development
-
-### Project Structure
-
-```
-flex-portal-extension/
-├── manifest.json          # Extension manifest
-├── src/
-│   ├── popup.html        # Popup interface
-│   ├── popup.js          # Popup logic
-│   ├── styles/           # CSS stylesheets
-│   ├── content.js        # Content script
-│   ├── background.js     # Background service worker
-│   └── utils/            # Utility functions
-├── icons/                # Extension icons
-├── README.md             # This file
-└── package.json          # Dependencies
-```
-
-### Prerequisites
-
-- Node.js (v14 or higher)
-- npm or yarn
-- Git
-- Basic understanding of JavaScript and browser extensions
-
-### Setup Development Environment
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/muhammadaliafzal205/flex-portal-extension.git
-   cd flex-portal-extension
-   ```
-
-2. Install dependencies:
+2. **Install Dependencies**
    ```bash
    npm install
    ```
 
-3. Start development server:
+3. **Build the Extension**
    ```bash
-   npm run dev
+   npm run build
    ```
 
-4. Load the extension in your browser (see Installation section)
+4. **Load in Chrome/Chromium Browser**
+   - Open `chrome://extensions/`
+   - Enable "Developer mode" (toggle in top-right corner)
+   - Click "Load unpacked"
+   - Select the `build/` or `dist/` directory from this project
 
-### Building the Extension
+5. **Load in Firefox**
+   - Open `about:debugging#/runtime/this-firefox`
+   - Click "Load Temporary Add-on"
+   - Select the manifest.json file from the project root
 
-Build for production:
-```bash
-npm run build
+### From Chrome Web Store (When Available)
+
+1. Visit the [Chrome Web Store](https://chromewebstore.google.com/)
+2. Search for "Flex Portal Extension"
+3. Click "Add to Chrome"
+4. Confirm the permissions in the popup
+
+---
+
+## File Structure
+
+```
+flex-portal-extension/
+├── src/
+│   ├── manifest.json          # Extension configuration and metadata
+│   ├── background.js          # Service worker for background tasks
+│   ├── content.js             # Content script for DOM manipulation
+│   ├── popup.html             # Popup UI HTML
+│   ├── popup.js               # Popup UI logic
+│   ├── popup.css              # Popup UI styles
+│   ├── options.html           # Settings/Options page
+│   ├── options.js             # Options page logic
+│   ├── options.css            # Options page styles
+│   ├── utils/
+│   │   ├── storage.js         # Storage utility functions
+│   │   ├── logger.js          # Logging utility
+│   │   └── constants.js       # Global constants
+│   ├── icons/
+│   │   ├── icon16.png         # 16x16 icon
+│   │   ├── icon48.png         # 48x48 icon
+│   │   ├── icon128.png        # 128x128 icon
+│   │   └── icon256.png        # 256x256 icon
+│   └── styles/
+│       └── shared.css         # Shared styles across components
+├── tests/
+│   ├── unit/
+│   │   ├── utils.test.js      # Unit tests for utilities
+│   │   └── background.test.js # Unit tests for background script
+│   ├── integration/
+│   │   └── integration.test.js # Integration tests
+│   └── fixtures/
+│       └── mock-data.js       # Mock data for testing
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml             # CI/CD pipeline
+│   │   └── tests.yml          # Test workflow
+│   └── ISSUE_TEMPLATE/
+│       └── bug_report.md      # Bug report template
+├── docs/
+│   ├── API.md                 # API documentation
+│   ├── ARCHITECTURE.md        # Architecture overview
+│   └── DEVELOPMENT.md         # Development guide
+├── .gitignore                 # Git ignore file
+├── package.json               # Node.js dependencies and scripts
+├── webpack.config.js          # Webpack configuration (if applicable)
+├── jest.config.js             # Jest testing configuration
+├── README.md                  # This file
+├── LICENSE                    # MIT License
+└── CONTRIBUTING.md            # Contributing guidelines
+
 ```
 
-This creates an optimized version in the `dist/` directory.
+---
 
-### Testing
+## Testing Instructions
 
-Run tests:
-```bash
-npm test
+### Prerequisites
+
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+
+### Running Tests
+
+1. **Install Test Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Run All Tests**
+   ```bash
+   npm test
+   ```
+
+3. **Run Unit Tests Only**
+   ```bash
+   npm run test:unit
+   ```
+
+4. **Run Integration Tests**
+   ```bash
+   npm run test:integration
+   ```
+
+5. **Run Tests with Coverage**
+   ```bash
+   npm run test:coverage
+   ```
+
+6. **Watch Mode (Auto-run on file changes)**
+   ```bash
+   npm run test:watch
+   ```
+
+### Test Structure
+
+- **Unit Tests**: Test individual functions and components in isolation
+- **Integration Tests**: Test interactions between components
+- **Fixtures**: Mock data and setup for consistent test environments
+
+### Writing Tests
+
+Tests should follow this naming convention: `<file-name>.test.js`
+
+Example:
+```javascript
+describe('Utility Functions', () => {
+  test('should format data correctly', () => {
+    const input = 'test';
+    const expected = 'TEST';
+    expect(formatData(input)).toBe(expected);
+  });
+});
 ```
 
-Run linting:
-```bash
-npm run lint
-```
+---
 
-Fix linting issues:
-```bash
-npm run lint:fix
-```
+## Development Workflow
 
-## 🤝 Contributing
+### Getting Started
 
-We welcome contributions! Here's how to get started:
-
-### Steps to Contribute
-
-1. **Fork the repository** on GitHub
-
-2. **Create a feature branch**:
+1. **Create a Feature Branch**
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
-3. **Make your changes** and test them thoroughly
+2. **Make Changes**
+   - Modify files in the `src/` directory
+   - Follow coding standards and conventions
+   - Add tests for new functionality
 
-4. **Commit your changes**:
+3. **Build the Extension**
    ```bash
-   git commit -m "Add description of your changes"
+   npm run build
    ```
 
-5. **Push to your fork**:
+4. **Test Locally**
+   - Load the extension in your browser (see Installation section)
+   - Test all functionality thoroughly
+   - Check for console errors (F12 → Console)
+
+5. **Commit Changes**
+   ```bash
+   git add .
+   git commit -m "feat: description of changes"
+   ```
+
+6. **Push to Remote**
    ```bash
    git push origin feature/your-feature-name
    ```
 
-6. **Create a Pull Request** with a clear description of changes
+7. **Create a Pull Request**
+   - Go to the GitHub repository
+   - Click "Compare & pull request"
+   - Fill in the PR template
+   - Request reviewers
 
-### Contribution Guidelines
+### Commit Message Convention
 
-- Follow the existing code style
-- Add comments for complex logic
-- Update documentation as needed
-- Write meaningful commit messages
-- Test your changes before submitting PR
-- Ensure all tests pass: `npm test`
+Follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
 
-### Reporting Bugs
+```
+<type>(<scope>): <subject>
 
-1. Check if the issue already exists on [GitHub Issues](https://github.com/muhammadaliafzal205/flex-portal-extension/issues)
-2. If not, create a new issue with:
-   - Clear, descriptive title
-   - Detailed description of the bug
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - Browser and OS information
-   - Screenshots if applicable
+<body>
 
-### Feature Requests
+<footer>
+```
 
-Submit feature requests as GitHub issues with:
-- Clear title describing the feature
-- Detailed explanation of the feature
-- Use cases and benefits
-- Optional mockups or examples
+**Types:**
+- `feat:` A new feature
+- `fix:` A bug fix
+- `docs:` Documentation changes
+- `style:` Code style changes (formatting, etc.)
+- `refactor:` Code refactoring
+- `test:` Adding or updating tests
+- `chore:` Build process, dependencies, etc.
 
-## 📄 License
+**Example:**
+```
+feat(popup): add dark mode toggle
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Allow users to switch between light and dark themes in the popup interface.
+Persists user preference in local storage.
 
-## 💬 Support
+Closes #42
+```
 
-### Getting Help
+### Code Standards
 
-- **Documentation**: Check this README and in-app help
-- **Issues**: Visit [GitHub Issues](https://github.com/muhammadaliafzal205/flex-portal-extension/issues)
-- **Email**: Contact through GitHub profile
-- **Discussion**: Use GitHub Discussions for general questions
+- **JavaScript**: Follow [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript)
+- **CSS**: Follow [Google CSS Style Guide](https://google.github.io/styleguide/htmlcssguide.html)
+- **Comments**: Write clear, meaningful comments for complex logic
+- **Variables**: Use descriptive names (e.g., `userPreferences` instead of `up`)
 
-### Reporting Security Issues
+### Debugging
 
-Do not open public issues for security vulnerabilities. Instead, please email security concerns directly (contact via GitHub profile).
+1. **Background Script**
+   - Open extension options or popup
+   - Go to `chrome://extensions/`
+   - Find this extension and click "Inspect views"
+
+2. **Content Script**
+   - Right-click on page → "Inspect"
+   - Check Console and Sources tabs
+
+3. **Storage**
+   ```javascript
+   // View all storage
+   chrome.storage.local.get(null, (items) => {
+     console.log('All storage:', items);
+   });
+   ```
 
 ---
 
-## 📝 Version History
+## Troubleshooting Guide
 
-### v1.0.0 (Initial Release)
-- Initial release with core features
-- Dark mode support
-- Export functionality
-- Keyboard shortcuts
+### Common Issues
+
+#### 1. Extension Not Loading
+
+**Problem:** Extension doesn't appear in `chrome://extensions/`
+
+**Solution:**
+- Ensure Developer mode is enabled
+- Check that manifest.json exists in the correct location
+- Verify the manifest.json syntax is valid (use JSON validator)
+- Reload the extension (if already loaded)
+
+#### 2. Content Script Not Running
+
+**Problem:** Changes don't appear on the web page
+
+**Solution:**
+- Check the manifest.json `content_scripts` configuration
+- Verify the `matches` pattern includes your target URLs
+- Reload the extension and refresh the page
+- Check the Console for errors (Ctrl+Shift+J)
+
+#### 3. Storage Not Working
+
+**Problem:** Settings aren't being saved
+
+**Solution:**
+```javascript
+// Test storage access
+chrome.storage.local.set({ test: 'value' }, () => {
+  console.log('Storage works');
+});
+```
+- Ensure using correct storage API (`chrome.storage.local` or `chrome.storage.sync`)
+- Check browser permissions in manifest.json
+- Clear extension data and try again
+
+#### 4. Popup Not Displaying
+
+**Problem:** Popup is blank or not showing content
+
+**Solution:**
+- Check popup.html is valid HTML
+- Verify popup.js loads correctly
+- Check Console in popup inspection for errors
+- Ensure CSS files are properly linked
+
+#### 5. High Memory Usage
+
+**Problem:** Extension consuming too much memory
+
+**Solution:**
+- Check for memory leaks in background script
+- Remove unnecessary event listeners
+- Optimize data structures
+- Profile with Chrome DevTools (Extensions icon → Inspect)
+
+### Debug Mode
+
+Enable debug logging:
+```javascript
+// In any script
+localStorage.setItem('DEBUG', 'true');
+```
+
+### Performance Tips
+
+- Use `chrome.alarms` instead of `setInterval` for background tasks
+- Lazy-load scripts when possible
+- Minimize DOM manipulation
+- Use event delegation for event listeners
+- Cache frequently accessed data
 
 ---
 
-**Last Updated**: 2026-01-09
+## Privacy Statement
 
-For the latest information and updates, visit our [GitHub repository](https://github.com/muhammadaliafzal205/flex-portal-extension).
+### Data Collection
+
+This extension respects user privacy and collects minimal data:
+
+- **Local Storage**: User preferences are stored locally on the device only
+- **Sync Storage**: Optional settings may be synced with the user's Google account (if enabled)
+- **No Remote Transmission**: This extension does not send user data to external servers
+
+### Permissions
+
+This extension requests the following permissions:
+
+- `storage`: To save user settings locally
+- `activeTab`: To access the current tab's content
+- `scripting`: To inject content scripts on matching pages
+
+### Data Retention
+
+- User data is stored until the extension is uninstalled
+- Users can clear their data anytime through the extension options
+- No backups or copies are maintained remotely
+
+### Third-Party Services
+
+This extension does not integrate with third-party services that collect data.
+
+### Changes to Privacy Policy
+
+We reserve the right to update this privacy statement. Changes will be reflected in the extension version updates.
+
+---
+
+## License
+
+This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
+
+### MIT License Summary
+
+You are free to:
+- ✅ Use the software for any purpose
+- ✅ Copy, modify, and distribute the software
+- ✅ Include the software in proprietary applications
+
+Under the condition that:
+- ⚠️ Include a copy of the license and copyright notice
+- ⚠️ State significant changes made to the software
+
+**Liability:** The software is provided "as is" without warranty.
+
+---
+
+## Contributing Guidelines
+
+We welcome contributions from the community! Please follow these guidelines:
+
+### Before You Start
+
+1. Check existing [Issues](https://github.com/muhammadaliafzal205/flex-portal-extension/issues) and [Pull Requests](https://github.com/muhammadaliafzal205/flex-portal-extension/pulls)
+2. Read the [Development Workflow](#development-workflow) section
+3. Ensure you have the latest code from main branch
+
+### How to Contribute
+
+1. **Fork the Repository**
+   ```bash
+   # Fork on GitHub, then clone your fork
+   git clone https://github.com/YOUR-USERNAME/flex-portal-extension.git
+   cd flex-portal-extension
+   git remote add upstream https://github.com/muhammadaliafzal205/flex-portal-extension.git
+   ```
+
+2. **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Make Your Changes**
+   - Write clean, readable code
+   - Add tests for new features
+   - Update documentation as needed
+   - Follow commit message conventions
+
+4. **Test Your Changes**
+   ```bash
+   npm test
+   npm run build
+   ```
+
+5. **Keep Your Branch Updated**
+   ```bash
+   git fetch upstream
+   git rebase upstream/main
+   ```
+
+6. **Push and Create Pull Request**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+7. **Fill Out the PR Template**
+   - Describe what changes you made
+   - Reference related issues
+   - Explain the reasoning behind changes
+
+### Pull Request Guidelines
+
+- **Title**: Use descriptive, conventional format (e.g., `feat: add dark mode support`)
+- **Description**: Clearly explain your changes and why they're needed
+- **Testing**: Describe how you tested the changes
+- **Screenshots**: Include before/after screenshots for UI changes
+- **No Merge Conflicts**: Ensure your branch is up to date
+- **All Tests Passing**: Run `npm test` and ensure all tests pass
+
+### Code Review Process
+
+1. At least one maintainer will review your PR
+2. Feedback will be provided if changes are needed
+3. Once approved, your PR will be merged
+4. You'll be credited in release notes
+
+### Reporting Issues
+
+Use the [issue tracker](https://github.com/muhammadaliafzal205/flex-portal-extension/issues) to report bugs:
+
+- **Clear Title**: Briefly describe the issue
+- **Reproduction Steps**: How to reproduce the bug
+- **Expected Behavior**: What should happen
+- **Actual Behavior**: What actually happens
+- **Environment**: Browser, OS, extension version
+- **Screenshots/Logs**: Include any relevant attachments
+
+### Code of Conduct
+
+All contributors must adhere to:
+- Be respectful and inclusive
+- Provide constructive feedback
+- Accept criticism gracefully
+- Focus on what's best for the community
+
+---
+
+## Roadmap
+
+### Version 1.0 (Current)
+- [x] Basic extension setup and structure
+- [x] Core functionality implementation
+- [x] Popup UI and styling
+- [x] Options page with settings
+- [x] Local storage integration
+- [ ] Bug fixes and optimization
+- [ ] Final testing and QA
+
+### Version 1.1 (Planned)
+- [ ] Dark mode support
+- [ ] Additional language support (i18n)
+- [ ] Enhanced settings customization
+- [ ] Performance improvements
+- [ ] User feedback form
+
+### Version 1.2 (Planned)
+- [ ] Sync storage across devices
+- [ ] Advanced filtering options
+- [ ] Export/import settings
+- [ ] Keyboard shortcuts
+- [ ] Context menu integration
+
+### Version 2.0 (Future)
+- [ ] Major UI redesign
+- [ ] API integration with portal services
+- [ ] Real-time notifications
+- [ ] Advanced analytics
+- [ ] Batch operations support
+
+### Under Consideration
+- [ ] Mobile browser support
+- [ ] Enterprise features
+- [ ] Integration with other tools
+- [ ] Custom themes marketplace
+- [ ] Community plugin system
+
+---
+
+## Resources
+
+- [Chrome Extension Documentation](https://developer.chrome.com/docs/extensions/)
+- [Firefox Add-on Documentation](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions)
+- [Web APIs Reference](https://developer.mozilla.org/en-US/docs/Web/API)
+- [JavaScript Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide)
+
+---
+
+## Support
+
+If you need help:
+
+1. **Check the Troubleshooting Guide** above
+2. **Search existing Issues** for similar problems
+3. **Create a new Issue** with detailed information
+4. **Contact the Maintainer**: Open a discussion in the repository
+
+---
+
+## Acknowledgments
+
+- Thanks to all contributors who have helped improve this project
+- Built with ❤️ for the community
+
+---
+
+**Last Updated**: January 9, 2026
+
+**Current Maintainer**: [muhammadaliafzal205](https://github.com/muhammadaliafzal205)
