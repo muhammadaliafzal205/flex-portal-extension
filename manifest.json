@@ -1,59 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Flex Portal Monitor",
+  "name": "Flex Portal Extension",
   "version": "1.0.0",
-  "description": "Monitor Flex Portal updates and receive instant notifications",
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "notifications",
-    "alarms",
-    "storage",
-    "webRequest"
-  ],
-  "host_permissions": [
-    "https://*.flexportal.com/*",
-    "http://*.flexportal.com/*"
-  ],
-  "background": {
-    "service_worker": "background.js"
+  "description": "A browser extension for managing Flex Portal",
+  "permissions": ["activeTab", "scripting"],
+  "icons": {
+    "16": "images/icon-16.svg",
+    "48": "images/icon-48.svg",
+    "128": "images/icon-128.svg"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://*.flexportal.com/*",
-        "http://*.flexportal.com/*"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "run_at": "document_start"
-    }
-  ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Flex Portal Monitor",
-    "default_icon": {
-      "16": "images/icon-16.png",
-      "48": "images/icon-48.png",
-      "128": "images/icon-128.png"
-    }
+    "default_title": "Flex Portal"
   },
-  "icons": {
-    "16": "images/icon-16.png",
-    "48": "images/icon-48.png",
-    "128": "images/icon-128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "content.js",
-        "styles/*.css"
-      ],
-      "matches": [
-        "https://*.flexportal.com/*",
-        "http://*.flexportal.com/*"
-      ]
-    }
-  ]
+  "background": {
+    "service_worker": "background.js"
+  }
 }
