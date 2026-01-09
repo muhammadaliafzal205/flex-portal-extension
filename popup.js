@@ -1,481 +1,292 @@
 /**
- * Popup.js - Handles popup interactions and notifications
+ * Popup Script - Handles popup UI interactions
  * Version: 1.0.0
- * Date: 2026-01-09
  */
 
-// ============================================================================
-// Utility Functions
-// ============================================================================
+// Initialize popup when DOM is ready
+document.addEventListener('DOMContentLoaded', initializePopup);
 
 /**
- * Show notification with specified type and message
- * @param {string} message - The notification message
- * @param {string} type - Type of notification: 'success', 'error', 'warning', 'info'
- * @param {number} duration - Duration in milliseconds (default: 3000)
- */
-function showNotification(message, type = 'info', duration = 3000) {
-  const notificationContainer = getOrCreateNotificationContainer();
-  
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  notification.setAttribute('role', 'alert');
-  
-  notification.innerHTML = `
-    <span class="notification-icon">${getNotificationIcon(type)}</span>
-    <span class="notification-message">${escapeHtml(message)}</span>
-    <button class="notification-close" aria-label="Close notification">&times;</button>
-  `;
-  
-  notificationContainer.appendChild(notification);
-  
-  // Add animation class
-  requestAnimationFrame(() => notification.classList.add('notification-show'));
-  
-  // Close button handler
-  const closeBtn = notification.querySelector('.notification-close');
-  closeBtn.addEventListener('click', () => removeNotification(notification));
-  
-  // Auto-remove after duration
-  if (duration > 0) {
-    setTimeout(() => removeNotification(notification), duration);
-  }
-  
-  return notification;
-}
-
-/**
- * Get or create notification container
- * @returns {HTMLElement} Notification container element
- */
-function getOrCreateNotificationContainer() {
-  let container = document.getElementById('notification-container');
-  
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-  }
-  
-  return container;
-}
-
-/**
- * Remove notification with animation
- * @param {HTMLElement} notification - Notification element to remove
- */
-function removeNotification(notification) {
-  notification.classList.remove('notification-show');
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-  }, 300);
-}
-
-/**
- * Get notification icon based on type
- * @param {string} type - Notification type
- * @returns {string} Icon HTML
- */
-function getNotificationIcon(type) {
-  const icons = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ'
-  };
-  return icons[type] || icons.info;
-}
-
-/**
- * Escape HTML special characters
- * @param {string} text - Text to escape
- * @returns {string} Escaped text
- */
-function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
-  return text.replace(/[&<>"']/g, (char) => map[char]);
-}
-
-// ============================================================================
-// Popup Interaction Handlers
-// ============================================================================
-
-/**
- * Initialize popup event listeners
+ * Initialize popup functionality
  */
 function initializePopup() {
-  // Button click handlers
-  attachButtonListeners();
+  console.log('[Popup] Initialized');
   
-  // Input handlers
-  attachInputListeners();
+  // Attach tab switching functionality
+  attachTabSwitching();
   
-  // Close button handler
-  attachCloseHandler();
+  // Attach button handlers
+  attachButtonHandlers();
   
-  // Load saved data
-  loadPopupState();
+  // Load and display current settings
+  loadPopupData();
   
-  // Log initialization
-  console.log('[Popup] Initialized at', new Date().toISOString());
+  // Update time display
+  updateTimeDisplay();
+  setInterval(updateTimeDisplay, 60000);
 }
 
 /**
- * Attach event listeners to buttons
+ * Attach tab switching functionality
  */
-function attachButtonListeners() {
-  const buttons = document.querySelectorAll('[data-action]');
+function attachTabSwitching() {
+  const tabButtons = document.querySelectorAll('.tab-button');
+  
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      const tabName = button.getAttribute('data-tab');
+      if (!tabName) return;
+      
+      // Remove active class from all buttons and contents
+      document.querySelectorAll('.tab-button').forEach((btn) => {
+        btn.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach((content) => {
+        content.classList.remove('active');
+      });
+      
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      const tabContent = document.getElementById(tabName);
+      if (tabContent) {
+        tabContent.classList.add('active');
+      }
+      
+      console.log('[Popup] Switched to tab:', tabName);
+    });
+  });
+}
+
+/**
+ * Attach event handlers to buttons
+ */
+function attachButtonHandlers() {
+  const buttons = document.querySelectorAll('.btn');
   
   buttons.forEach((button) => {
-    button.addEventListener('click', handleButtonClick);
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleButtonClick(button);
+    });
   });
 }
 
 /**
  * Handle button click events
- * @param {Event} event - Click event
+ * @param {HTMLElement} button - Clicked button element
  */
-function handleButtonClick(event) {
-  const action = event.currentTarget.getAttribute('data-action');
-  const actionData = event.currentTarget.getAttribute('data-value');
+function handleButtonClick(button) {
+  const buttonText = button.textContent.trim();
+  const action = button.getAttribute('data-action');
   
-  console.log('[Button Click] Action:', action, 'Data:', actionData);
+  console.log('[Button Clicked]', buttonText);
   
-  switch (action) {
-    case 'submit':
-      handleSubmit();
+  switch (buttonText) {
+    case 'Update Now':
+      showNotification('Update started...', 'info', 2000);
       break;
-    case 'reset':
-      handleReset();
-      break;
-    case 'clear':
-      handleClear();
-      break;
-    case 'copy':
-      handleCopy(actionData);
-      break;
-    case 'open-link':
-      handleOpenLink(actionData);
-      break;
-    default:
-      console.warn('[Button Click] Unknown action:', action);
-  }
-}
-
-/**
- * Attach event listeners to input fields
- */
-function attachInputListeners() {
-  const inputs = document.querySelectorAll('input, textarea, select');
-  
-  inputs.forEach((input) => {
-    input.addEventListener('change', handleInputChange);
-    input.addEventListener('input', handleInputChange);
-  });
-}
-
-/**
- * Handle input change events
- * @param {Event} event - Change event
- */
-function handleInputChange(event) {
-  const { name, value, type } = event.target;
-  
-  // Validate input
-  if (type === 'email' && !isValidEmail(value)) {
-    showNotification('Please enter a valid email address', 'warning', 2000);
-    event.target.classList.add('input-error');
-    return;
-  }
-  
-  event.target.classList.remove('input-error');
-  
-  // Save to local storage
-  saveInputState(name, value);
-  
-  console.log('[Input Change]', name, ':', value);
-}
-
-/**
- * Attach close button handler
- */
-function attachCloseHandler() {
-  const closeBtn = document.querySelector('[data-close]');
-  
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closePopup);
-  }
-}
-
-/**
- * Close the popup
- */
-function closePopup() {
-  console.log('[Popup] Closing');
-  window.close();
-}
-
-// ============================================================================
-// Form Action Handlers
-// ============================================================================
-
-/**
- * Handle form submission
- */
-function handleSubmit() {
-  const form = document.querySelector('form') || document.querySelector('[role="form"]');
-  
-  if (!form) {
-    showNotification('No form found', 'error');
-    return;
-  }
-  
-  // Validate form
-  if (!validateForm(form)) {
-    showNotification('Please fill in all required fields', 'warning');
-    return;
-  }
-  
-  // Get form data
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData);
-  
-  // Log submission
-  console.log('[Form Submit]', data);
-  
-  // Send to background script or content script
-  sendMessage({
-    action: 'formSubmit',
-    data: data
-  });
-  
-  showNotification('Form submitted successfully!', 'success');
-}
-
-/**
- * Handle form reset
- */
-function handleReset() {
-  const form = document.querySelector('form') || document.querySelector('[role="form"]');
-  
-  if (form) {
-    form.reset();
-    clearInputState();
-    showNotification('Form reset', 'info');
-    console.log('[Form Reset]');
-  }
-}
-
-/**
- * Handle clear action
- */
-function handleClear() {
-  clearInputState();
-  showNotification('Data cleared', 'info');
-  console.log('[Clear Data]');
-}
-
-/**
- * Handle copy to clipboard
- * @param {string} text - Text to copy
- */
-function handleCopy(text) {
-  if (!text) {
-    showNotification('Nothing to copy', 'warning');
-    return;
-  }
-  
-  navigator.clipboard.writeText(text)
-    .then(() => {
-      showNotification('Copied to clipboard!', 'success', 2000);
-      console.log('[Copy] Text copied:', text);
-    })
-    .catch((error) => {
-      showNotification('Failed to copy text', 'error');
-      console.error('[Copy] Error:', error);
-    });
-}
-
-/**
- * Handle open link
- * @param {string} url - URL to open
- */
-function handleOpenLink(url) {
-  if (!url) {
-    showNotification('No URL provided', 'warning');
-    return;
-  }
-  
-  chrome.tabs.create({ url: url });
-  console.log('[Open Link]', url);
-}
-
-// ============================================================================
-// Validation Functions
-// ============================================================================
-
-/**
- * Validate email format
- * @param {string} email - Email address to validate
- * @returns {boolean} True if valid
- */
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-/**
- * Validate form
- * @param {HTMLElement} form - Form element to validate
- * @returns {boolean} True if valid
- */
-function validateForm(form) {
-  const requiredFields = form.querySelectorAll('[required]');
-  
-  for (let field of requiredFields) {
-    if (!field.value.trim()) {
-      field.classList.add('input-error');
-      return false;
-    }
-    field.classList.remove('input-error');
-  }
-  
-  return true;
-}
-
-// ============================================================================
-// Storage Management
-// ============================================================================
-
-/**
- * Save input state to local storage
- * @param {string} name - Input name
- * @param {string} value - Input value
- */
-function saveInputState(name, value) {
-  try {
-    const state = JSON.parse(localStorage.getItem('popupState')) || {};
-    state[name] = value;
-    localStorage.setItem('popupState', JSON.stringify(state));
-  } catch (error) {
-    console.error('[Storage] Error saving state:', error);
-  }
-}
-
-/**
- * Load popup state from local storage
- */
-function loadPopupState() {
-  try {
-    const state = JSON.parse(localStorage.getItem('popupState')) || {};
     
-    Object.entries(state).forEach(([name, value]) => {
-      const input = document.querySelector(`[name="${name}"]`);
-      if (input) {
-        input.value = value;
+    case 'Later':
+      showNotification('Update reminder set', 'info', 2000);
+      break;
+    
+    case 'Clear Cache':
+      chrome.storage.local.clear(() => {
+        showNotification('Cache cleared successfully', 'success', 2000);
+      });
+      break;
+    
+    case 'Skip':
+      showNotification('Skipped', 'info', 2000);
+      break;
+    
+    case 'Clear Data':
+      if (confirm('Are you sure you want to clear all data?')) {
+        chrome.storage.local.clear(() => {
+          showNotification('All data cleared', 'success', 2000);
+        });
       }
-    });
+      break;
     
-    console.log('[Storage] State loaded');
-  } catch (error) {
-    console.error('[Storage] Error loading state:', error);
+    case 'Reset Settings':
+      if (confirm('Are you sure you want to reset all settings?')) {
+        chrome.storage.local.set({
+          extensionEnabled: true,
+          autoRefresh: false,
+          refreshInterval: 5000,
+          notifications: true,
+          theme: 'light'
+        }, () => {
+          showNotification('Settings reset to default', 'success', 2000);
+        });
+      }
+      break;
+    
+    case 'View Logs':
+      showNotification('Opening logs...', 'info', 2000);
+      break;
+    
+    default:
+      if (action) {
+        handleCustomAction(action);
+      }
   }
 }
 
 /**
- * Clear input state from storage
+ * Handle custom actions
+ * @param {string} action - Action name
  */
-function clearInputState() {
-  try {
-    localStorage.removeItem('popupState');
-    document.querySelectorAll('input, textarea').forEach((input) => {
-      input.value = '';
-    });
-    console.log('[Storage] State cleared');
-  } catch (error) {
-    console.error('[Storage] Error clearing state:', error);
+function handleCustomAction(action) {
+  switch (action) {
+    case 'open-settings':
+      chrome.runtime.openOptionsPage();
+      break;
+    
+    case 'open-help':
+      chrome.tabs.create({ url: 'https://github.com/muhammadaliafzal205/flex-portal-extension' });
+      break;
+    
+    default:
+      console.log('[Custom Action]', action);
   }
 }
 
-// ============================================================================
-// Message Handling
-// ============================================================================
-
 /**
- * Send message to background script
- * @param {object} message - Message object
+ * Load popup data from storage
  */
-function sendMessage(message) {
-  chrome.runtime.sendMessage(message, (response) => {
+function loadPopupData() {
+  chrome.storage.local.get(null, (result) => {
     if (chrome.runtime.lastError) {
-      console.error('[Message] Error:', chrome.runtime.lastError);
-      showNotification('Communication error', 'error');
+      console.error('[Popup] Error loading data:', chrome.runtime.lastError);
       return;
     }
     
-    console.log('[Message] Response:', response);
+    console.log('[Popup] Loaded data:', result);
     
-    if (response && response.success) {
-      showNotification(response.message || 'Operation completed', 'success');
-    } else if (response && response.error) {
-      showNotification(response.error, 'error');
+    // Update popup display with loaded data if needed
+    if (result && Object.keys(result).length > 0) {
+      // Data is available
+      console.log('[Popup] Data loaded successfully');
     }
   });
 }
 
 /**
- * Listen for messages from background script
+ * Update time display
  */
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('[Message Received]', request);
-  
-  if (request.action === 'showNotification') {
-    showNotification(request.message, request.type, request.duration);
+function updateTimeDisplay() {
+  const timeElement = document.getElementById('current-time');
+  if (timeElement) {
+    const now = new Date();
+    const iso = now.toISOString();
+    const date = iso.split('T')[0];
+    const time = iso.split('T')[1].substring(0, 8);
+    timeElement.textContent = `Last updated: ${date} ${time} UTC`;
   }
-  
-  sendResponse({ received: true });
-});
-
-// ============================================================================
-// Initialization
-// ============================================================================
-
-// Initialize popup when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializePopup);
-} else {
-  initializePopup();
 }
 
-// Log when popup is closed
+/**
+ * Show notification to user
+ * @param {string} message - Notification message
+ * @param {string} type - Notification type (success, error, warning, info)
+ * @param {number} duration - Duration in milliseconds
+ */
+function showNotification(message, type = 'info', duration = 3000) {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.setAttribute('role', 'alert');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+  `;
+  
+  // Set border color based on type
+  const borderColors = {
+    success: '#48bb78',
+    error: '#f56565',
+    warning: '#ed8936',
+    info: '#4299e1'
+  };
+  notification.style.borderLeftColor = borderColors[type] || borderColors.info;
+  
+  // Add message
+  notification.textContent = message;
+  
+  // Add to DOM
+  document.body.appendChild(notification);
+  
+  // Auto remove after duration
+  if (duration > 0) {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, duration);
+  }
+}
+
+/**
+ * Send message to background script
+ * @param {object} message - Message to send
+ * @param {function} callback - Response callback
+ */
+function sendMessageToBackground(message, callback) {
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
+    chrome.runtime.sendMessage(message, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('[Popup] Error sending message:', chrome.runtime.lastError);
+        if (callback) callback({ error: chrome.runtime.lastError.message });
+      } else {
+        if (callback) callback(response);
+      }
+    });
+  } else {
+    console.error('[Popup] Chrome runtime not available');
+  }
+}
+
+/**
+ * Get current popup status
+ */
+function getPopupStatus() {
+  sendMessageToBackground(
+    { action: 'getPopupStatus' },
+    (response) => {
+      if (response && response.success) {
+        console.log('[Popup] Status:', response);
+      }
+    }
+  );
+}
+
+// Listen for messages from background script
+if (typeof chrome !== 'undefined' && chrome.runtime) {
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('[Popup] Message received:', request);
+    
+    if (request.action === 'updatePopup') {
+      loadPopupData();
+      sendResponse({ received: true });
+    }
+  });
+}
+
+// Clean up when popup closes
 window.addEventListener('beforeunload', () => {
   console.log('[Popup] Closing');
 });
 
-// Export functions for testing
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    showNotification,
-    closePopup,
-    handleSubmit,
-    handleReset,
-    handleClear,
-    handleCopy,
-    handleOpenLink,
-    isValidEmail,
-    validateForm,
-    saveInputState,
-    loadPopupState,
-    clearInputState,
-    sendMessage
-  };
-}
+console.log('[Popup] Script loaded successfully');
