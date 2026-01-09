@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex Portal Extension</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 400px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: white;
+            color: #666;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .tab-button:hover {
+            background: #f8f9ff;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Notifications Section */
+        .notification-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .notification-item.success {
+            border-left-color: #48bb78;
+        }
+
+        .notification-item.warning {
+            border-left-color: #ed8936;
+        }
+
+        .notification-item.error {
+            border-left-color: #f56565;
+        }
+
+        .notification-item.info {
+            border-left-color: #4299e1;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .notification-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .notification-message {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .notification-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-warning {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        /* Update History Section */
+        .history-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 4px solid #764ba2;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .history-item:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .history-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 4px;
+        }
+
+        .history-version {
+            font-size: 11px;
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .history-changes {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .history-changes li {
+            margin-left: 16px;
+            margin-bottom: 4px;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-text {
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            padding: 12px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        /* Scrollbar Styling */
+        .content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-active {
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Flex Portal Extension</h1>
+            <p id="current-time">Last updated: 2026-01-09 19:22:17 UTC</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="notifications">
+                Notifications
+            </button>
+            <button class="tab-button" data-tab="updates">
+                Update History
+            </button>
+            <button class="tab-button" data-tab="settings">
+                Settings
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Notifications Tab -->
+            <div id="notifications" class="tab-content active">
+                <div class="notification-item success">
+                    <div class="notification-header">
+                        <div>
+                            <span class="notification-badge badge-success">SUCCESS</span>
+                            <span class="notification-title">Portal Connected</span>
+                        </div>
+                        <span class="notification-time">2 min ago</span>
+                    </div>
+                    <div class="notification-message">Successfully connected to Flex Portal. All features are operational.</div>
+                </div>
+
+                <div class="notification-item info">
+                    <div class="notification-header">
+                        <div>
+                            <span class="notification-badge badge-info">INFO</span>
+                            <span class="notification-title">New Update Available</span>
+                        </div>
+                        <span class="notification-time">15 min ago</span>
+                    </div>
+                    <div class="notification-message">Version 2.1.0 is now available. Click 'Update' to install the latest features and improvements.</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">Update Now</button>
+                        <button class="btn btn-secondary">Later</button>
+                    </div>
+                </div>
+
+                <div class="notification-item success">
+                    <div class="notification-header">
+                        <div>
+                            <span class="notification-badge badge-success">SUCCESS</span>
+                            <span class="notification-title">Data Synced</span>
+                        </div>
+                        <span class="notification-time">1 hour ago</span>
+                    </div>
+                    <div class="notification-message">All your data has been successfully synchronized with the portal.</div>
+                </div>
+
+                <div class="notification-item warning">
+                    <div class="notification-header">
+                        <div>
+                            <span class="notification-badge badge-warning">WARNING</span>
+                            <span class="notification-title">Cache Clearing Required</span>
+                        </div>
+                        <span class="notification-time">3 hours ago</span>
+                    </div>
+                    <div class="notification-message">For optimal performance, it's recommended to clear your browser cache. Would you like to do this now?</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">Clear Cache</button>
+                        <button class="btn btn-secondary">Skip</button>
+                    </div>
+                </div>
+
+                <div class="notification-item info">
+                    <div class="notification-header">
+                        <div>
+                            <span class="notification-badge badge-info">INFO</span>
+                            <span class="notification-title">Maintenance Scheduled</span>
+                        </div>
+                        <span class="notification-time">5 hours ago</span>
+                    </div>
+                    <div class="notification-message">Scheduled maintenance will occur on 2026-01-10 from 02:00 to 04:00 UTC. Some features may be unavailable during this time.</div>
+                </div>
+            </div>
+
+            <!-- Update History Tab -->
+            <div id="updates" class="tab-content">
+                <div class="history-item">
+                    <div class="history-title">
+                        <span class="status-indicator status-active"></span>
+                        Version 2.1.0 - Current
+                    </div>
+                    <div class="history-version">Latest Release</div>
+                    <div class="history-changes">
+                        <ul>
+                            <li>Added real-time notifications system</li>
+                            <li>Improved popup UI with better responsive design</li>
+                            <li>Fixed sync issues with portal data</li>
+                            <li>Enhanced performance and reduced memory usage</li>
+                            <li>Added dark mode support (beta)</li>
+                        </ul>
+                    </div>
+                    <div class="history-date">Released: 2026-01-08 12:30:00 UTC</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-title">Version 2.0.5</div>
+                    <div class="history-version">Previous Release</div>
+                    <div class="history-changes">
+                        <ul>
+                            <li>Bug fixes for popup rendering</li>
+                            <li>Improved connection stability</li>
+                            <li>Updated dependencies</li>
+                            <li>Minor UI improvements</li>
+                        </ul>
+                    </div>
+                    <div class="history-date">Released: 2025-12-15 08:15:00 UTC</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-title">Version 2.0.0</div>
+                    <div class="history-version">Major Release</div>
+                    <div class="history-changes">
+                        <ul>
+                            <li>Complete UI redesign with modern interface</li>
+                            <li>New tabbed navigation system</li>
+                            <li>Added update history tracking</li>
+                            <li>Improved security and data protection</li>
+                            <li>Performance optimization</li>
+                        </ul>
+                    </div>
+                    <div class="history-date">Released: 2025-11-20 10:45:00 UTC</div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-title">Version 1.5.2</div>
+                    <div class="history-version">Legacy</div>
+                    <div class="history-changes">
+                        <ul>
+                            <li>Initial notification system</li>
+                            <li>Basic synchronization features</li>
+                            <li>First stable release</li>
+                        </ul>
+                    </div>
+                    <div class="history-date">Released: 2025-10-01 14:20:00 UTC</div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="history-item" style="margin-bottom: 12px;">
+                    <div class="history-title">Extension Settings</div>
+                    <div class="history-changes" style="margin-top: 12px;">
+                        <label style="display: block; margin-bottom: 12px;">
+                            <input type="checkbox" checked> Auto-sync data
+                        </label>
+                        <label style="display: block; margin-bottom: 12px;">
+                            <input type="checkbox" checked> Enable notifications
+                        </label>
+                        <label style="display: block; margin-bottom: 12px;">
+                            <input type="checkbox"> Enable dark mode
+                        </label>
+                        <label style="display: block; margin-bottom: 12px;">
+                            <input type="checkbox" checked> Check for updates automatically
+                        </label>
+                    </div>
+                </div>
+
+                <div class="history-item" style="margin-bottom: 12px;">
+                    <div class="history-title">Quick Actions</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">Clear Data</button>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">Reset Settings</button>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary">View Logs</button>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-title">About</div>
+                    <div class="history-changes" style="margin-top: 12px; font-size: 12px;">
+                        <p><strong>Version:</strong> 2.1.0</p>
+                        <p style="margin-top: 8px;"><strong>Build:</strong> 20260109</p>
+                        <p style="margin-top: 8px;"><strong>License:</strong> MIT</p>
+                        <p style="margin-top: 8px;"><strong>Developed by:</strong> Muhammad Ali Afzal</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2026 Flex Portal Extension. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const utcTime = now.toISOString().split('T');
+            const date = utcTime[0];
+            const time = utcTime[1].substring(0, 8);
+            document.getElementById('current-time').textContent = `Last updated: ${date} ${time} UTC`;
+        }
+
+        // Update time on page load
+        updateCurrentTime();
+
+        // Update time every minute
+        setInterval(updateCurrentTime, 60000);
+
+        // Button click handlers (can be connected to actual functionality)
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = button.textContent.trim();
+                console.log(`Button clicked: ${action}`);
+                // Add your actual button functionality here
+            });
+        });
+    </script>
+</body>
+</html>
